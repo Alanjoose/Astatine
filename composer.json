@@ -1,0 +1,22 @@
+{
+    "name": "alanjoose/astatine",
+    "description": "A simple backend api for your php applications.",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alanjoose",
+            "email": "alanjsyt@gmail.com",
+            "homepage": "https://github.com/Alanjoose",
+            "role": "Dev"
+        }
+    ]
+}
