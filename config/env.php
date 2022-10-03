@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Returns an assoc array with the env configs.
+ */
 return [
     
     'DATABASE_DRIVER' => $_ENV['DATABASE_DRIVER'],
