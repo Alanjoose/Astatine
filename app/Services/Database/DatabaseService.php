@@ -4,9 +4,9 @@ namespace App\Services\Database;
 
 interface DatabaseService
 {
-    public static function begginTransaction();
-    public static function commit();
-    public static function rollback();
+    public static function startTransaction();
+    public static function makeCommit();
+    public static function makeRollback();
     public static function table(string $table);
 
     public function save(string|array $columnsAndValues);

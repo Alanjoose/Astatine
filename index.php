@@ -1,7 +1,13 @@
 <?php
 
+use App\Database\DB;
 use App\Providers\DBProvider;
 
 require 'kernel.php';
 
-DBProvider::getInstance();
+if(DB::makeRollback()) {
+    echo "PASSED";
+}
+else {
+    echo "FAILED";
+}
