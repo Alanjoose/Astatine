@@ -13,4 +13,5 @@ interface DatabaseService
     public function select(string|array $columns);
     public function where(string|array $columnsAndValues);
     public function delete();
+
 }
