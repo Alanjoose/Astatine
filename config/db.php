@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * The database configs file.
+ */
 return [
 
     'DATABASE_DRIVER' => $_ENV['DATABASE_DRIVER'],
