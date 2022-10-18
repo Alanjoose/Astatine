@@ -151,7 +151,7 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return bool
      */
-    public function save(array $columnsAndValues): bool
+    public function save(array $columnsAndValues): bool|array
     {
         try
         {
@@ -187,9 +187,8 @@ class DB extends DatabaseSocket implements DBService
         {
         
         $statement = $this->queryBuilder->buildSelectStatement(self::$table, $columns);
-        $query = parent::getInstance()->query($statement)->fetchAll(PDO::FETCH_OBJ);
-
-        return count($query) > 0 ? $query : null;
+        
+        return parent::getInstance()->query($statement)->fetchAll(PDO::FETCH_OBJ);
 
         }
         catch(\PDOException $exception)
@@ -211,15 +210,20 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return object|null
      */
-    public function find(int $id): object|bool
+    public function find(int $id): object|array
     {
         try
         {
 
         $statement = $this->queryBuilder->buildWhereStatement(self::$table, 'id', '=', $id);
+
         $query = parent::getInstance()->query($statement)->fetch(PDO::FETCH_OBJ);
-        
-        return !is_null($query) > 0 ? $query : null;
+
+        if(!$query) {
+        throw new \PDOException("Resource not found.");
+        }
+
+        return $query;
 
         }
         catch(\PDOException $exception)
@@ -279,18 +283,15 @@ class DB extends DatabaseSocket implements DBService
         try
         {
         
-        $socket = parent::getInstance();
-
-        $object = $this->find($primaryKeyValue);
-
-        if(!$object) {
-        throw new PDOException("Resource not found.");
+        $statement = $this->queryBuilder->buildWhereStatement(self::$table, 'id', '=', $primaryKeyValue);
+        $query = parent::getInstance()->query($statement)->fetch(PDO::FETCH_OBJ);
+       
+        if(!$query) {
+        throw new \Exception("Resource not found.");
         }
 
-        $statement = $socket->prepare($this->queryBuilder
-        ->buildUpdateStatement(self::$table, $columnsAndValues, $primaryKeyValue));
-
-        return $statement->execute();
+        $statement = $this->queryBuilder->buildUpdateStatement(self::$table, $columnsAndValues, $primaryKeyValue);
+        return parent::getInstance()->prepare($statement)->execute();
 
         }
         catch(\PDOException $exception)
