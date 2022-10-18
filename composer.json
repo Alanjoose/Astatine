@@ -15,7 +15,8 @@
         }
     },
     "require": {
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+        "robmorgan/phinx": "^0.13.1"
     }
     
 }
