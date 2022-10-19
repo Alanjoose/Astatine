@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+/*********************************************************
+ * -----------------MASK PROVIDER-----------------
+ * 
+ * The Mask Facade provides encryptation for the sensible
+ * data in your application.
+ *********************************************************/
 class MaskProvider
 {
     //TODO: Add the models that has fields to be hasheds.
@@ -9,15 +15,39 @@ class MaskProvider
 
     ];
 
-    protected static function makeHash(string $unencryptedString, int $rounds): string
+    private static function getCryptOptions($configs, $rounds)
+    {
+        try
+        {
+            
+            $options = [
+                'cost' => $rounds,
+                'memory_cost' => $configs['CRYPTO_MEMORY_COST'],
+                'time_cost' => $configs['CRYPTO_TIME_COST'],
+                'theads' => $configs['CRYPTO_THREADS']
+            ];
+            
+            return $options;
+        }
+        catch(\Exception $exception)
+        {
+            return [
+                'message' => 'Error on hash generate.',
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
+
+    protected static function makeHash(string $stringToEncrypt, int $rounds): string
     {
         try
         {
             $configs = include 'config/crypto.php';
-
-            $crypto = password_hash($unencryptedString, $configs['CRYPTO_ALGORITHM'], [
-                'cost' => $rounds,
-            ]);
+            $options = self::getCryptOptions($configs, $rounds);
+            $crypto = password_hash($stringToEncrypt, $configs['CRYPTO_ALGO'], $options);
 
             return $crypto;
         }
