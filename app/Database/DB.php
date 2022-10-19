@@ -30,7 +30,7 @@ class DB extends DatabaseSocket implements DBService
 {
 
     private $queryBuilder;
-    public static string $table;
+    private static string $table;
 
     public function __construct()
     {
