@@ -1,8 +1,11 @@
 <?php
 
 use App\Database\DB;
+use App\Facades\Mask;
 
 require 'kernel.php';
 
-$arr = ['name' => 'test', 'email' => 'baz@email.com', 'password' => 123456];
-print_r(DB::table('users')->update($arr, 5));
+// DB::table('users')->save(['name' => 'Alan', 'email' => 'alan@test.com', 'password' => Mask::make('password')]);
+// $user = DB::table('users')->find(4);
+
+print_r(Mask::check('password', Mask::make('password')));
