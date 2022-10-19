@@ -1,5 +1,11 @@
 <?php
 
+/*********************************************************
+ * -----------------CRYPTO CONFIGS FILE----------------- 
+ *
+ * This file returns the config to be used on Mask facade.
+ * 
+ *********************************************************/
 return [
 
     'CRYPTO_ALGO' => PASSWORD_BCRYPT,

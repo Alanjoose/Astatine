@@ -1,8 +1,12 @@
 <?php
 
-/**
- * The database configs file.
- */
+/*********************************************************
+ * -----------------DB CONFIGS FILE----------------- 
+ *
+ * This file returns the configs to be used on DBProvider
+ * module.
+ * 
+ *********************************************************/
 return [
 
     'DATABASE_DRIVER' => $_ENV['DATABASE_DRIVER'],

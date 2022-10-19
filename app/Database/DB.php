@@ -42,7 +42,7 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return bool
      */
-    public static function startTransaction(): bool
+    public static function startTransaction(): bool|array
     {
         try
         {
@@ -68,7 +68,7 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return bool
      */
-    public static function makeCommit(): bool
+    public static function makeCommit(): bool|array
     {
         try
         {
@@ -94,7 +94,7 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return bool
      */
-    public static function makeRollback(): bool
+    public static function makeRollback(): bool|array
     {
         try
         {
@@ -181,7 +181,7 @@ class DB extends DatabaseSocket implements DBService
      * 
      * @return array|null
      */
-    public function select(?array $columns = null): array|null
+    public function select(?array $columns = null): array
     {
         try
         {

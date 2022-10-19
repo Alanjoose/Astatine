@@ -2,8 +2,31 @@
 
 namespace App\Services\Builder;
 
+
+/******************************************************************************************************************
+ * -----------------BUILDER SERVICE IMPLEMENTATION----------------- 
+ *
+ * The Builder Service implementation builds the logic to construct the statements
+ * to handle the database.
+ * 
+ * @method public buildInsertStatement(string $table, array $columnsAndValues): string
+ * @method public buildSelectStatement(string $table, ?array $columns = null): string
+ * @method public buildWhereStatement(string $table, string $keyName, ?string $operator, mixed $keyValue): string 
+ * @method public buildUpdateStatement(string $table, array $columnsAndValues, mixed $primaryKeyValue): string;
+ * @method public buildDeleteStatement(string $table, mixed $primaryKeyValue): string
+ * 
+ *******************************************************************************************************************/
+
 class BuilderServiceImpl implements BuilderService
 {
+    /**
+     * This method builds te insert statment using the columnsAndValues assoc
+     * array.
+     * 
+     * @param string $table
+     * @param array $columnsAndValues
+     * @return string
+     */
     public function buildInsertStatement(string $table, array $columnsAndValues): string
     {
         try
@@ -49,6 +72,13 @@ class BuilderServiceImpl implements BuilderService
         }
     }
 
+    /**
+     * This method use the columns nullable array to build the select statement.
+     * 
+     * @param string $table
+     * @param ?array $columns
+     * @return string
+     */
     public function buildSelectStatement(string $table, ?array $columns = null): string
     {
         try
@@ -93,6 +123,16 @@ class BuilderServiceImpl implements BuilderService
         }
     }
 
+    /**
+     * Thid method build the 'where' statement using operator and value.
+     * 
+     * @param string $table
+     * @param string $keyName
+     * @param ?string $operator
+     * @param mixed $keyValue
+     * @return string
+     * 
+     */
     public function buildWhereStatement(string $table, string $keyName, ?string $operator, mixed $keyValue): string
     {
         try
@@ -137,6 +177,14 @@ class BuilderServiceImpl implements BuilderService
         }
     }
 
+    /**
+     * This method builds the update statment using the table primary key value.
+     * 
+     * @param string $table
+     * @param array $columnsAndValues
+     * @param mixed $primaryKeyValue
+     * @return string
+     */
     public function buildUpdateStatement(string $table, array $columnsAndValues, mixed $primaryKeyValue): string
     {
         try
@@ -191,6 +239,13 @@ class BuilderServiceImpl implements BuilderService
         }
     }
 
+    /**
+     * This method builds the delete statement using the table primary key value.
+     * 
+     * @param string $table
+     * @param mixed $primaryKeyValue
+     * @return string
+     */
     public function buildDeleteStatement(string $table, mixed $primaryKeyValue): string
     {
         try
