@@ -25,7 +25,7 @@ class Mask extends MaskProvider
      * for your enviroment. A large number of rounds can negatively
      *  affect your server's performance.
      */
-    public static function make(string $stringToEncrypt, int $rounds = 8): string
+    public static function make(string $stringToEncrypt, int $rounds = 10): string
     {
         return parent::makeHash($stringToEncrypt, $rounds);
     }

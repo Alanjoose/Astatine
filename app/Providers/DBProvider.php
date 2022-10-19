@@ -5,15 +5,12 @@ namespace App\Providers;
 use Exception;
 use PDO;
 
-/**
- * This class provides a database connection
- * abstration.
+/*********************************************************
+ * -----------------DB PROVIDER-----------------
  * 
- * @var static $instance
- * @var static $configs
- * 
- * @method getInstance(): PDO
- */
+ * The DB Provider returns a PDO database connection instance
+ * to be used by the other modules.
+ *********************************************************/
 class DBProvider
 {
     /**
