@@ -1,8 +1,10 @@
 <?php
 
-use App\Database\DB;
-use App\Facades\Mask;
-
 require 'kernel.php';
 
-print_r(Mask::make('pAssWd1424'));
+$templatesDir = 'templates/iridium';
+$object = 'model';
+$file = $templatesDir.'/'.ucwords($object).'Template.php.dist';
+// print_r(file_get_contents($file));
+
+print_r(file_put_contents('app/Models/Test.php', file_get_contents($file)));
