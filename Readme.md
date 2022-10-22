@@ -1,4 +1,4 @@
-# #Astatine - An useful backend toolbox for PHP applications
+# Astatine - An useful backend toolbox for PHP applications
 
 
 # What's Astatine
