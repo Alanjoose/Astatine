@@ -1,22 +1,21 @@
 {
     "name": "alanjoose/astatine",
-    "description": "A simple backend toolbox api for your php projects.",
-    "authors": [
-        {
-            "name": "Alanjoose",
-            "email": "alanjsdelima@gmail.com",
-            "homepage": "https://github.com/Alanjoose",
-            "role": "Dev"
-        }
-    ],
+    "description": "A simple toolbox for your php apps.",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "robmorgan/phinx": "^0.13.1",
+        "phpmailer/phpmailer": "^6.6"
+    },
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "App\\": "app/"
         }
     },
-    "require": {
-        "vlucas/phpdotenv": "^5.5",
-        "robmorgan/phinx": "^0.13.1"
-    }
-    
+    "authors": [
+        {
+            "name": "Alanjoose"
+        }
+    ]
 }

@@ -47,7 +47,7 @@ final class ProgressBar
     private float $lastWriteTime = 0;
     private float $minSecondsBetweenRedraws = 0;
     private float $maxSecondsBetweenRedraws = 1;
-    private OutputInterface $output;
+    private $output;
     private int $step = 0;
     private ?int $max = null;
     private int $startTime;
@@ -56,9 +56,9 @@ final class ProgressBar
     private int $formatLineCount;
     private array $messages = [];
     private bool $overwrite = true;
-    private Terminal $terminal;
+    private $terminal;
     private ?string $previousMessage = null;
-    private Cursor $cursor;
+    private $cursor;
 
     private static array $formatters;
     private static array $formats;
@@ -489,13 +489,17 @@ final class ProgressBar
 
     private function determineBestFormat(): string
     {
-        return match ($this->output->getVerbosity()) {
+        switch ($this->output->getVerbosity()) {
             // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
-            OutputInterface::VERBOSITY_VERBOSE => $this->max ? self::FORMAT_VERBOSE : self::FORMAT_VERBOSE_NOMAX,
-            OutputInterface::VERBOSITY_VERY_VERBOSE => $this->max ? self::FORMAT_VERY_VERBOSE : self::FORMAT_VERY_VERBOSE_NOMAX,
-            OutputInterface::VERBOSITY_DEBUG => $this->max ? self::FORMAT_DEBUG : self::FORMAT_DEBUG_NOMAX,
-            default => $this->max ? self::FORMAT_NORMAL : self::FORMAT_NORMAL_NOMAX,
-        };
+            case OutputInterface::VERBOSITY_VERBOSE:
+                return $this->max ? self::FORMAT_VERBOSE : self::FORMAT_VERBOSE_NOMAX;
+            case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                return $this->max ? self::FORMAT_VERY_VERBOSE : self::FORMAT_VERY_VERBOSE_NOMAX;
+            case OutputInterface::VERBOSITY_DEBUG:
+                return $this->max ? self::FORMAT_DEBUG : self::FORMAT_DEBUG_NOMAX;
+            default:
+                return $this->max ? self::FORMAT_NORMAL : self::FORMAT_NORMAL_NOMAX;
+        }
     }
 
     private static function initPlaceholderFormatters(): array

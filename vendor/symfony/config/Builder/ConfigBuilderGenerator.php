@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Builder;
 
 use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
@@ -68,12 +67,14 @@ public function NAME(): string
             $this->writeClasses();
         }
 
-        return function () use ($path, $rootClass) {
+        $loader = \Closure::fromCallable(function () use ($path, $rootClass) {
             require_once $path;
             $className = $rootClass->getFqcn();
 
             return new $className();
-        };
+        });
+
+        return $loader;
     }
 
     private function getFullPath(ClassBuilder $class): string
@@ -136,20 +137,15 @@ public function NAME(): string
         $this->classes[] = $childClass;
 
         $hasNormalizationClosures = $this->hasNormalizationClosures($node);
-        $comment = $this->getComment($node);
-        if ($hasNormalizationClosures) {
-            $comment .= sprintf(' * @return %s|$this'."\n ", $childClass->getFqcn());
-        }
-        if ('' !== $comment) {
-            $comment = "/**\n$comment*/\n";
-        }
-
         $property = $class->addProperty(
             $node->getName(),
             $this->getType($childClass->getFqcn(), $hasNormalizationClosures)
         );
         $body = $hasNormalizationClosures ? '
-COMMENTpublic function NAME(mixed $value = []): CLASS|static
+/**
+ * @return CLASS|$this
+ */
+public function NAME(mixed $value = []): CLASS|static
 {
     if (!\is_array($value)) {
         $this->_usedProperties[\'PROPERTY\'] = true;
@@ -167,7 +163,7 @@ COMMENTpublic function NAME(mixed $value = []): CLASS|static
 
     return $this->PROPERTY;
 }' : '
-COMMENTpublic function NAME(array $value = []): CLASS
+public function NAME(array $value = []): CLASS
 {
     if (null === $this->PROPERTY) {
         $this->_usedProperties[\'PROPERTY\'] = true;
@@ -179,7 +175,7 @@ COMMENTpublic function NAME(array $value = []): CLASS
     return $this->PROPERTY;
 }';
         $class->addUse(InvalidConfigurationException::class);
-        $class->addMethod($node->getName(), $body, ['COMMENT' => $comment, 'PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
+        $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
 
         $this->buildNode($node, $childClass, $this->getSubNamespace($childClass));
     }
@@ -277,17 +273,12 @@ public function NAME(string $VAR, TYPE $VALUE): static
             $this->getType($childClass->getFqcn().'[]', $hasNormalizationClosures)
         );
 
-        $comment = $this->getComment($node);
-        if ($hasNormalizationClosures) {
-            $comment .= sprintf(' * @return %s|$this'."\n ", $childClass->getFqcn());
-        }
-        if ('' !== $comment) {
-            $comment = "/**\n$comment*/\n";
-        }
-
         if (null === $key = $node->getKeyAttribute()) {
             $body = $hasNormalizationClosures ? '
-COMMENTpublic function NAME(mixed $value = []): CLASS|static
+/**
+ * @return CLASS|$this
+ */
+public function NAME(mixed $value = []): CLASS|static
 {
     $this->_usedProperties[\'PROPERTY\'] = true;
     if (!\is_array($value)) {
@@ -298,16 +289,19 @@ COMMENTpublic function NAME(mixed $value = []): CLASS|static
 
     return $this->PROPERTY[] = new CLASS($value);
 }' : '
-COMMENTpublic function NAME(array $value = []): CLASS
+public function NAME(array $value = []): CLASS
 {
     $this->_usedProperties[\'PROPERTY\'] = true;
 
     return $this->PROPERTY[] = new CLASS($value);
 }';
-            $class->addMethod($methodName, $body, ['COMMENT' => $comment, 'PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
+            $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
         } else {
             $body = $hasNormalizationClosures ? '
-COMMENTpublic function NAME(string $VAR, mixed $VALUE = []): CLASS|static
+/**
+ * @return CLASS|$this
+ */
+public function NAME(string $VAR, mixed $VALUE = []): CLASS|static
 {
     if (!\is_array($VALUE)) {
         $this->_usedProperties[\'PROPERTY\'] = true;
@@ -325,7 +319,7 @@ COMMENTpublic function NAME(string $VAR, mixed $VALUE = []): CLASS|static
 
     return $this->PROPERTY[$VAR];
 }' : '
-COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
+public function NAME(string $VAR, array $VALUE = []): CLASS
 {
     if (!isset($this->PROPERTY[$VAR])) {
         $this->_usedProperties[\'PROPERTY\'] = true;
@@ -338,7 +332,7 @@ COMMENTpublic function NAME(string $VAR, array $VALUE = []): CLASS
 }';
             $class->addUse(InvalidConfigurationException::class);
             $class->addMethod($methodName, $body, [
-                'COMMENT' => $comment, 'PROPERTY' => $property->getName(),
+                'PROPERTY' => $property->getName(),
                 'CLASS' => $childClass->getFqcn(),
                 'VAR' => '' === $key ? 'key' : $key,
                 'VALUE' => 'value' === $key ? 'data' : 'value',
@@ -400,41 +394,31 @@ public function NAME($value): static
         return null;
     }
 
-    private function getComment(BaseNode $node): string
+    private function getComment(VariableNode $node): string
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
             $comment .= ' * '.$info."\n";
         }
 
-        if (!$node instanceof ArrayNode) {
-            foreach ((array) ($node->getExample() ?? []) as $example) {
-                $comment .= ' * @example '.$example."\n";
-            }
+        foreach ((array) ($node->getExample() ?? []) as $example) {
+            $comment .= ' * @example '.$example."\n";
+        }
 
-            if ('' !== $default = $node->getDefaultValue()) {
-                $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
-            }
+        if ('' !== $default = $node->getDefaultValue()) {
+            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
+        }
 
-            if ($node instanceof EnumNode) {
-                $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
-                    return var_export($a, true);
-                }, $node->getValues())))."\n";
-            } else {
-                $parameterType = $this->getParameterType($node);
-                if (null === $parameterType || '' === $parameterType) {
-                    $parameterType = 'mixed';
-                }
-                $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'."\n";
-            }
+        if ($node instanceof EnumNode) {
+            $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
+                return var_export($a, true);
+            }, $node->getValues())))."\n";
         } else {
-            foreach ((array) ($node->getExample() ?? []) as $example) {
-                $comment .= ' * @example '.json_encode($example)."\n";
+            $parameterType = $this->getParameterType($node);
+            if (null === $parameterType || '' === $parameterType) {
+                $parameterType = 'mixed';
             }
-
-            if ($node->hasDefaultValue() && [] != $default = $node->getDefaultValue()) {
-                $comment .= ' * @default '.json_encode($default)."\n";
-            }
+            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'."\n";
         }
 
         if ($node->isDeprecated()) {
@@ -450,7 +434,7 @@ public function NAME($value): static
     private function getSingularName(PrototypedArrayNode $node): string
     {
         $name = $node->getName();
-        if (!str_ends_with($name, 's')) {
+        if ('s' !== substr($name, -1)) {
             return $name;
         }
 
@@ -582,7 +566,7 @@ public function NAME(string $key, mixed $value): static
     {
         try {
             $r = new \ReflectionProperty($node, 'normalizationClosures');
-        } catch (\ReflectionException) {
+        } catch (\ReflectionException $e) {
             return false;
         }
         $r->setAccessible(true);

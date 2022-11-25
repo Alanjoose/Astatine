@@ -193,7 +193,7 @@ class YamlReferenceDumper
 
     private function writeArray(array $array, int $depth)
     {
-        $isIndexed = array_is_list($array);
+        $isIndexed = array_values($array) === $array;
 
         foreach ($array as $key => $value) {
             if (\is_array($value)) {

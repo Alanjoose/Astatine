@@ -31,7 +31,7 @@ class ProgressIndicator
         'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
     ];
 
-    private OutputInterface $output;
+    private $output;
     private int $startTime;
     private ?string $format = null;
     private ?string $message = null;
@@ -191,13 +191,16 @@ class ProgressIndicator
 
     private function determineBestFormat(): string
     {
-        return match ($this->output->getVerbosity()) {
+        switch ($this->output->getVerbosity()) {
             // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
-            OutputInterface::VERBOSITY_VERBOSE => $this->output->isDecorated() ? 'verbose' : 'verbose_no_ansi',
-            OutputInterface::VERBOSITY_VERY_VERBOSE,
-            OutputInterface::VERBOSITY_DEBUG => $this->output->isDecorated() ? 'very_verbose' : 'very_verbose_no_ansi',
-            default => $this->output->isDecorated() ? 'normal' : 'normal_no_ansi',
-        };
+            case OutputInterface::VERBOSITY_VERBOSE:
+                return $this->output->isDecorated() ? 'verbose' : 'verbose_no_ansi';
+            case OutputInterface::VERBOSITY_VERY_VERBOSE:
+            case OutputInterface::VERBOSITY_DEBUG:
+                return $this->output->isDecorated() ? 'very_verbose' : 'very_verbose_no_ansi';
+            default:
+                return $this->output->isDecorated() ? 'normal' : 'normal_no_ansi';
+        }
     }
 
     /**
