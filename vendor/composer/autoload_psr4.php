@@ -24,10 +24,11 @@ return array(
     'Phinx\\' => array($vendorDir . '/robmorgan/phinx/src/Phinx'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'GrahamCampbell\\ResultType\\' => array($vendorDir . '/graham-campbell/result-type/src'),
+    'Engine\\' => array($baseDir . '/engine'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'Cake\\Utility\\' => array($vendorDir . '/cakephp/utility'),
     'Cake\\Datasource\\' => array($vendorDir . '/cakephp/datasource'),
     'Cake\\Database\\' => array($vendorDir . '/cakephp/database'),
     'Cake\\Core\\' => array($vendorDir . '/cakephp/core'),
-    'Alanjoose\\Astatine\\' => array($baseDir . '/app'),
+    'App\\' => array($baseDir . '/app'),
 );

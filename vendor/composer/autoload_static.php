@@ -47,6 +47,10 @@ class ComposerStaticInitb556a59bfead4d96359bd2e188417b0b
         array (
             'GrahamCampbell\\ResultType\\' => 26,
         ),
+        'E' => 
+        array (
+            'Engine\\' => 7,
+        ),
         'D' => 
         array (
             'Dotenv\\' => 7,
@@ -60,7 +64,7 @@ class ComposerStaticInitb556a59bfead4d96359bd2e188417b0b
         ),
         'A' => 
         array (
-            'Alanjoose\\Astatine\\' => 19,
+            'App\\' => 4,
         ),
     );
 
@@ -137,6 +141,10 @@ class ComposerStaticInitb556a59bfead4d96359bd2e188417b0b
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
+        'Engine\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/engine',
+        ),
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
@@ -157,7 +165,7 @@ class ComposerStaticInitb556a59bfead4d96359bd2e188417b0b
         array (
             0 => __DIR__ . '/..' . '/cakephp/core',
         ),
-        'Alanjoose\\Astatine\\' => 
+        'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
