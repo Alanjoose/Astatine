@@ -4,9 +4,9 @@ namespace Engine\Sockets;
 
 abstract class Socket
 {
-    public static $instance;
+    protected static $instance;
 
-    abstract public static function getInstance();
+    abstract protected static function getInstance();
 
     abstract protected static function testConnection($instance);
 

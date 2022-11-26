@@ -8,9 +8,9 @@ use PDOException;
 
 class MysqlSocket extends Socket
 {
-    public static $instance;
+    protected static $instance;
 
-    public static function getInstance()
+    protected static function getInstance()
     {
         try
         {
