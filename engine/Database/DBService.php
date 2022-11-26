@@ -12,6 +12,7 @@ interface DBService
     public function save($columnsAndValues);
     public function select($columns);
     public function find($id);
+    public function get($columns);
     public function where($keyName, $operator, $keyValue);
     public function update($columnsAndValues, $primaryKeyValue);
     public function delete($primaryKeyValue);

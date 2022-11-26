@@ -48,30 +48,26 @@ class CatalyzeServiceImpl implements CatalyzeService
         }
     }
 
-    public function buildSelectStatement($table, $columns = null)
+    public function buildSelectStatement($table, $columns)
     {
         try
         {
-            $statement = "select ";
-            if(!isset($columns)):
-
-            $statement.="* from {$table}";
-
-            echo $statement;
-
-            else:
-
-            if(in_array("*", $columns)) {
+            if(is_array($columns) && in_array("*", $columns)) {
                 throw new \Exception("The * char is the default value for the columns. Aborting query...");
                 die(1);
+            }
+
+            $statement = "select ";
+
+            if(is_null($columns)) {
+                $statement.="* from {$table}";
+                return $statement;
             }
 
             $finalColumns = implode(", ", $columns);
             $statement.="$finalColumns from {$table}";
 
             return $statement;
-
-            endif;
 
         }
         catch(\Exception $exception)
@@ -86,12 +82,12 @@ class CatalyzeServiceImpl implements CatalyzeService
         }
     }
 
-    public function buildWhereStatement($table, $keyName, $operator = "=", $keyValue)
+    public function buildWhereStatement($keyName, $operator = "=", $keyValue)
     {
-                try
+        try
         {
-            $statement = !isset($operator) ? "select * from {$table} where {$keyName} = " 
-            : "select * from {$table} where {$keyName} {$operator} ";
+            $statement = !isset($operator) ? " where {$keyName} = " 
+            : " where {$keyName} {$operator} ";
 
             if(is_string($keyValue)) {
             $statement.="'$keyValue'";
@@ -114,6 +110,28 @@ class CatalyzeServiceImpl implements CatalyzeService
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
             ]
+            ];
+        }
+    }
+
+    public function buildFindStatement($table, $id)
+    {
+        try
+        {
+            if(!is_numeric($id)) {
+                throw new \Exception("The id must be a numeric value");
+            }
+            $statement = "select * from {$table} where id = {$id}";
+            return $statement;
+        }
+        catch(\Exception $exception)
+        {
+            return [
+                'message' => 'Error on find the specified resoruce on database',
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
             ];
         }
     }
