@@ -3,12 +3,15 @@
 namespace Engine\Database;
 
 use Engine\Catalyze\CatalyzeServiceImpl as Catalyze;
+use Engine\Contracts\Database\HandleColumnValues;
 use Engine\Sockets\MysqlSocket;
 use PDO;
 use PDOException;
 
 class DB extends MysqlSocket implements DBService
 {
+    use HandleColumnValues;
+
     private static $table;
     
     private $catalyze;
@@ -83,12 +86,16 @@ class DB extends MysqlSocket implements DBService
     {
         try
         {
+            DB::startTransaction();
             self::$statement = $this->catalyze
             ->buildInsertStatement(self::$table, $columnsAndValues);
-            return parent::getInstance()->prepare(self::$statement)->execute();
+            parent::getInstance()->prepare(self::$statement)->execute();
+            echo "CHEGOU!";
+            return DB::makeCommit();
         }
         catch(PDOException $exception)
         {
+            DB::makeRollback();
             return [
                 'message' => 'Error on save data on database',
                 'data' => [
@@ -123,9 +130,14 @@ class DB extends MysqlSocket implements DBService
     {
         try
         {
+            if(!is_null($columns)) {
+                self::$statement = $this->replaceColumnsOnGet($columns, self::$statement);
+            }
+
             if(strpos(self::$statement, "where") && is_null($columns)) {
                 return parent::getInstance()->query(self::$statement)->fetchAll(PDO::FETCH_OBJ);
             }
+
             return $this->select($columns);
         }
         catch(PDOException $exception)
@@ -144,27 +156,35 @@ class DB extends MysqlSocket implements DBService
     {
         try
         {
-           if(strpos(self::$statement, "where")) {
-                self::$statement.=" and {$keyName} {$operator} ";
+            self::$statement = $this->catalyze
+            ->buildWhereStatement(self::$table, $keyName, $operator, $keyValue);
+            return parent::getInstance()->query(self::$statement)->fetchAll(PDO::FETCH_OBJ);
+        }
+        catch(PDOException $exception)
+        {
+            return [
+                'message' => 'Error on find the specified resource',
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
 
-                if(is_string($keyValue)) {
-                self::$statement.="'{$keyValue}'";
-                }
-                else if(!$keyValue) {
-                self::$statement.=0;
-                }
-                else {
-                self::$statement.=$keyValue;
-                }
-
+    public function whereAnd($keyName, $operator, $keyValue)
+    {
+        try
+        {
+            if(strpos(self::$statement, "where")) {
+                self::$statement.=" and {$keyName} {$operator} ".$this->separeValuesByType($keyValue);
                 return new static;
-           }
-           else {
-               self::$statement = $this->catalyze
-               ->buildSelectStatement(self::$table, null).
-               $this->catalyze->buildWhereStatement($keyName, $operator, $keyValue);
-               return new static;
             }
+
+            self::$statement = $this->catalyze
+            ->buildSelectStatement(self::$table, null).$this->catalyze
+            ->buildMultipleWhereStatement($keyName, $operator, $keyValue);
+            return new static;
         }
         catch(PDOException $exception)
         {
@@ -198,16 +218,80 @@ class DB extends MysqlSocket implements DBService
         }
     }
 
-    public function update($columnsAndValues, $primaryKeyValue)
+    public function first($columns = null)
     {
         try
         {
             self::$statement = $this->catalyze
-            ->buildUpdateStatement(self::$table, $columnsAndValues, $primaryKeyValue);
-            return parent::getInstance()->prepare(self::$statement)->execute();
+            ->buildSelectStatement(self::$table, $columns)." limit 1";
+            return parent::getInstance()->query(self::$statement)->fetch(PDO::FETCH_OBJ);
         }
         catch(PDOException $exception)
         {
+            return [
+                'message' => 'Error on find the specified resource from table '.self::$table,
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
+
+    public function last($columns = null)
+    {
+        try
+        {
+            self::$statement = $this->catalyze
+            ->buildSelectStatement(self::$table, $columns)." order by id desc limit 1";
+            return parent::getInstance()->query(self::$statement)->fetch(PDO::FETCH_OBJ);
+        }
+        catch(PDOException $exception)
+        {
+            return [
+                'message' => 'Error on find the specified resource from table '.self::$table,
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
+
+    public function exists()
+    {
+        try
+        {
+            $newStatement = "select exists(".self::$statement.")";
+            $result = parent::getInstance()->prepare($newStatement)
+            ->execute();
+            return $result->rowCount() > 0;
+        }
+        catch(PDOException $exception)
+        {
+            return [
+                'message' => 'Error on check if the resource exists',
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
+
+    public function update($columnsAndValues, $primaryKeyValue)
+    {
+        try
+        {
+            DB::startTransaction();
+            self::$statement = $this->catalyze
+            ->buildUpdateStatement(self::$table, $columnsAndValues, $primaryKeyValue);
+            return parent::getInstance()->prepare(self::$statement)->execute();
+            DB::makeCommit();
+        }
+        catch(PDOException $exception)
+        {
+            DB::makeRollback();
             return [
                 'message' => 'Error on update the specified resource from table '.self::$table,
                 'data' => [

@@ -39,7 +39,7 @@ class CatalyzeServiceImpl implements CatalyzeService
         catch(\Exception $exception)
         {
             return [
-            'message' => 'An error occurred on build the insert statement.',
+            'message' => 'Error on build the insert statement.',
             'data' => [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
@@ -73,7 +73,7 @@ class CatalyzeServiceImpl implements CatalyzeService
         catch(\Exception $exception)
         {
             return [
-            'message' => 'An error occurred on build the insert statement.',
+            'message' => 'Error on build the insert statement.',
             'data' => [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
@@ -82,7 +82,36 @@ class CatalyzeServiceImpl implements CatalyzeService
         }
     }
 
-    public function buildWhereStatement($keyName, $operator = "=", $keyValue)
+    public function buildWhereStatement($table, $keyName, $operator, $keyValue)
+    {
+        try
+        {
+            $statement = "select * from {$table} where {$keyName} {$operator} ";
+
+            if(is_string($keyValue)) {
+                $statement.="'{$keyValue}'";
+            }
+            else if(!$keyValue) {
+                $statement.=0;
+            }
+            else {
+                $statement.=$keyValue;
+            }
+            return $statement;
+        }
+        catch(\Exception $exception)
+        {
+            return [
+                'message' => 'Error on make conditional query from table '.$table,
+                'data' => [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ]
+            ];
+        }
+    }
+
+    public function buildMultipleWhereStatement($keyName, $operator, $keyValue)
     {
         try
         {
@@ -105,7 +134,7 @@ class CatalyzeServiceImpl implements CatalyzeService
             catch(\Exception $exception)
             {
             return [
-            'message' => 'An error occurred on build the where statement.',
+            'message' => 'Error on build the where statement.',
             'data' => [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
@@ -127,7 +156,7 @@ class CatalyzeServiceImpl implements CatalyzeService
         catch(\Exception $exception)
         {
             return [
-                'message' => 'Error on find the specified resoruce on database',
+                'message' => 'Error on build the find statement',
                 'data' => [
                     'message' => $exception->getMessage(),
                     'trace' => $exception->getTraceAsString()
@@ -181,7 +210,7 @@ class CatalyzeServiceImpl implements CatalyzeService
         catch(\Exception $exception)
         {
             return [
-            'message' => 'An error occurred on build the where statement.',
+            'message' => 'Error on build the where statement.',
             'data' => [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
@@ -202,7 +231,7 @@ class CatalyzeServiceImpl implements CatalyzeService
         catch(\Exception $exception)
         {
             return [
-            'message' => 'An error occurred on build the delete statement.',
+            'message' => 'Error on build the delete statement.',
             'data' => [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
