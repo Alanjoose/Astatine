@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     'DB_DRIVER' => $_ENV['DB_DRIVER'],
 
     'DB_HOST' => $_ENV['DB_HOST'],
@@ -10,4 +11,5 @@ return [
     'DB_USERNAME' => $_ENV['DB_USERNAME'],
 
     'DB_PASSWORD' => $_ENV['DB_PASSWORD']
+    
 ];
