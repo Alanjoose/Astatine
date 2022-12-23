@@ -1,0 +1,22 @@
+{
+    "name": "alanjoose/astatine",
+    "description": "A simple quickstart api to your php projects.",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "robmorgan/phinx": "^0.13.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alanjoose",
+            "email": "alanjsyt@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
