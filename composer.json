@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "vlucas/phpdotenv": "^5.5",
-        "robmorgan/phinx": "^0.13.4"
+        "robmorgan/phinx": "^0.13.4",
+        "phpmailer/phpmailer": "^6.7"
     },
     "license": "MIT",
     "autoload": {

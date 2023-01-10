@@ -21,3 +21,8 @@ function config($keyDotValue)
     $configFile = include_once 'config/'.$separatedValues[0].'.php';
     return $configFile[strtoupper(end($separatedValues))];
 }
+
+function getFomMailer($key)
+{
+    return $_ENV['MAIL_'.$key];
+}
