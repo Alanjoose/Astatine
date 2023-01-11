@@ -26,3 +26,8 @@ function getFomMailer($key)
 {
     return $_ENV['MAIL_'.$key];
 }
+
+function storagePath($path)
+{
+    return "storage/".$path;
+}
